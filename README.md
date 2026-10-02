@@ -1,8 +1,20 @@
 # Neoantigen Database
 
-A curated, browsable database of cancer neoantigens: the tumour mutation, the mutant peptide it creates, the HLA molecule that presents it, the predicted binding and immunogenicity, and the experimental evidence that T cells respond. The curation was compiled by a student team from published literature.
+A curated, browsable database of cancer neoantigens: the tumour mutation, the mutant peptide it creates, the HLA molecule that presents it, the predicted binding and immunogenicity, and the experimental evidence that T cells respond. 
 
 The team curates in an Excel workbook. A Python script loads that workbook into PostgreSQL, and a FastAPI server serves both a small JSON API and the website.
+
+## Team
+
+| Name | Role |
+|---|---|
+| **Dia (Diavats)** | Designed and built the database and website: data loader, database, API, and the full frontend |
+| Eshan | Curated KRAS records and the KRAS mutation catalogue |
+| Abhishek | Curated BRAF records and the BRAF V600E frequency table |
+| Ashutosh | Curated the EGFR alteration table, its summary and column guide |
+| Valerie | Curated PIK3CA records |
+| Manya | Curated IDH1 records |
+| Ehtesham | Curated TP53 records |
 
 ## Features
 
@@ -21,7 +33,7 @@ The team curates in an Excel workbook. A Python script loads that workbook into 
 | Database | PostgreSQL 16 (Docker container) |
 | Backend | Python 3.11, FastAPI, SQLAlchemy, Uvicorn |
 | Data loading | openpyxl (reads the Excel file directly, including hidden hyperlinks) |
-| Frontend | Plain HTML, CSS and JavaScript, with no framework and no build step |
+| Frontend | Plain HTML, CSS and JavaScript |
 | Font | Atkinson Hyperlegible Next and Mono (Google Fonts), chosen so I, l, 1 and O, 0 never look alike in peptide sequences |
 
 ## Project structure
@@ -86,7 +98,27 @@ To use a different database, copy `backend/.env.example` to `backend/.env` and e
 
 Sheets that hold several small tables separated by blank rows are split into separate tables. The heading row is the first row that fills most of the table's width. Template rows (cells like `<cancer type>`) are dropped.
 
-## API
+## API: what it is and how to look at it
+
+**What it is.** The website itself never reads the database directly. It asks the server questions at addresses that start with `/api/`, such as "give me all KRAS records", and the server answers with plain data (JSON). These addresses are the API.
+
+**Why it exists.**
+- It keeps the website and the data separate: the page only draws, and the server only answers.
+- The same data can be used by other tools without the website, for example a Python script, a notebook, or a future app.
+- It makes the data easy to check: every number on the website can be traced to one of these answers.
+
+**How anyone can look at it (no coding needed).** Start the server (see Setup), then open these links in a normal browser:
+
+| Open this link | You will see |
+|---|---|
+| <http://127.0.0.1:8000/docs> | **An interactive page listing every API address.** Click one, press **Try it out**, then **Execute** to see the real answer. This is the easiest way to explore. |
+| <http://127.0.0.1:8000/api/health> | `{"ok": true}`, meaning the server is running |
+| <http://127.0.0.1:8000/api/tabs> | The tabs shown on the site, with how many records each has |
+| <http://127.0.0.1:8000/api/neoantigens?gene=KRAS> | All KRAS records as data |
+| <http://127.0.0.1:8000/api/neoantigens/1> | Record number 1 |
+| <http://127.0.0.1:8000/api/references?tab=EGFR> | The extra EGFR tables |
+
+**Full list (for developers):**
 
 | Endpoint | Returns |
 |---|---|
@@ -102,6 +134,8 @@ Sheets that hold several small tables separated by blank rows are split into sep
 cd backend
 .\.venv\Scripts\python test_ingest.py     # prints "all checks passed"
 ```
+
+This checks the suspicious-link detector used on the Legacy tab. It does not test the API; to check the API, use the `/docs` page above.
 
 ## Known data issues (to be checked by the curators)
 
