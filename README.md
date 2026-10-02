@@ -8,7 +8,7 @@ The team curates in an Excel workbook. A Python script loads that workbook into 
 
 | Name | Role |
 |---|---|
-| **Dia (Diavats)** | Designed and built the database and website: data loader, database, API, and the full frontend |
+| Dia | Designed and built the database and website: data loader, database, API, and the full frontend |
 | Eshan | Curated KRAS records and the KRAS mutation catalogue |
 | Abhishek | Curated BRAF records and the BRAF V600E frequency table |
 | Ashutosh | Curated the EGFR alteration table, its summary and column guide |
@@ -107,7 +107,6 @@ Sheets that hold several small tables separated by blank rows are split into sep
 - The same data can be used by other tools without the website, for example a Python script, a notebook, or a future app.
 - It makes the data easy to check: every number on the website can be traced to one of these answers.
 
-**How anyone can look at it (no coding needed).** Start the server (see Setup), then open these links in a normal browser:
 
 | Open this link | You will see |
 |---|---|
@@ -118,7 +117,7 @@ Sheets that hold several small tables separated by blank rows are split into sep
 | <http://127.0.0.1:8000/api/neoantigens/1> | Record number 1 |
 | <http://127.0.0.1:8000/api/references?tab=EGFR> | The extra EGFR tables |
 
-**Full list (for developers):**
+**Full list:**
 
 | Endpoint | Returns |
 |---|---|
