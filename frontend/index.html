@@ -1,0 +1,108 @@
+<!doctype html>
+<!--
+  index.html: the main page of the Neoantigen Database.
+
+  This file is only the skeleton (the empty boxes). The JavaScript file app.js
+  fills the boxes with real data from the server, and style.css paints them.
+
+  The page, from top to bottom:
+    1. Header: the name of the database and the search box.
+    2. Tabs: Database, one tab per gene, and Legacy. Click one to switch.
+    3. The panel under the tabs, which changes with the tab:
+         - the ELISpot plate (one well per record),
+         - the records table (the same columns as the Excel 'Database' tab),
+         - extra tables from the team's other Excel tabs.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neoantigen Database</title>
+<meta name="description" content="Curated cancer neoantigens: mutations, peptides, HLA presentation and immunogenicity evidence.">
+<!-- The font: Atkinson Hyperlegible. Its letters I, l and 1 (and O, Q, 0) never look alike,
+     which matters because peptide sequences are full of I and L. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- 1. Header -->
+  <header class="masthead">
+    <div>
+      <h1>Neoantigen Database</h1>
+      <p class="lede">Tumour-specific peptides, the HLA molecules that present them, and the evidence that T cells respond. Curated from published studies.</p>
+    </div>
+    <label class="search">
+      <span class="visually-hidden">Search records</span>
+      <input id="q" type="search" placeholder="Search gene, peptide, HLA, PMID…" autocomplete="off">
+    </label>
+  </header>
+
+  <!-- 2. Tabs (app.js adds one button per tab) -->
+  <nav class="tabs" role="tablist" aria-label="Sections" id="tabs"></nav>
+
+  <!-- 3. The panel that belongs to the chosen tab -->
+  <main class="panel" id="panel" role="tabpanel">
+
+    <!-- Shown only on the Legacy tab -->
+    <section class="notice" id="legacy-note" hidden>
+      <h2>Older summary table (Sheet1)</h2>
+      <p>This table came from an earlier version of the spreadsheet. <strong id="legacy-count">Some</strong> of its paper links look automatically generated: each one is the link above it with its last number increased by one, which real papers almost never are. They are marked in red. Please open and verify each one before citing it.</p>
+    </section>
+
+    <!-- The ELISpot plate: each well is one record, the spots show its immunogenicity -->
+    <section class="bench" id="bench">
+      <div class="plate" id="plate" aria-label="Plate map: one well per record"></div>
+      <div class="readout">
+        <h2 id="plate-title">Plate read-out</h2>
+        <p class="hint">One well per record. Spots show the immunogenicity the source reported, read the way an IFN-γ ELISpot is read.</p>
+        <ul class="key" id="key"></ul>
+        <p class="well-info" id="well-info" aria-live="polite">Point at a well to read it. Click it to jump to its row.</p>
+      </div>
+    </section>
+
+    <!-- The records table: the same columns, in the same groups, as the Excel 'Database' tab -->
+    <section id="records">
+      <div class="table-head">
+        <h2 id="records-title">Records</h2>
+        <p class="count" id="count"></p>
+      </div>
+      <div class="scroll">
+        <table class="records">
+          <thead>
+            <tr class="groups">
+              <!-- S. No. is left out on purpose: it is only the spreadsheet's row counter. -->
+              <th rowspan="2" class="g-plain">Data Source</th>
+              <th rowspan="2" class="g-plain">PMID</th>
+              <th colspan="3" class="g-context">Cancer and clinical context</th>
+              <th colspan="4" class="g-mutation">Mutation</th>
+              <th colspan="4" class="g-peptide">Peptide Information</th>
+              <th colspan="4" class="g-hla">HLA and Predicted Data</th>
+              <th colspan="4" class="g-evidence">Evidence</th>
+              <th rowspan="2" class="g-plain">Annotator</th>
+            </tr>
+            <!-- Each sub-heading wears a light tint of its group's colour -->
+            <tr class="subs">
+              <th class="t-context">Cancer Type</th><th class="t-context">Cancer Stage</th><th class="t-context">Treatment and response</th>
+              <th class="t-mutation">Gene</th><th class="t-mutation">Mutation Type</th><th class="t-mutation">Location</th><th class="t-mutation">Hotspot/Recurrent</th>
+              <th class="t-peptide">Wild Type Sequences</th><th class="t-peptide">Mutant Sequences</th><th class="t-peptide">Peptide Length</th><th class="t-peptide">Source Protein [Uniprot ID]</th>
+              <th class="t-hla">HLA</th><th class="t-hla">Predicted Binding Affinity (nM)</th><th class="t-hla">Immunogenicity Score</th><th class="t-hla">Tool(s) used</th>
+              <th class="t-evidence">Evidence Type</th><th class="t-evidence">Assay Method</th><th class="t-evidence">Immunogenic/Non-Immunogenic</th><th class="t-evidence">Clinical Trial (if any)</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="empty" hidden></p>
+    </section>
+
+    <!-- Extra tables from the other Excel tabs (KRAS, BRAF, EGFR, Legacy) -->
+    <section id="references"></section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

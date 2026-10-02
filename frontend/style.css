@@ -1,0 +1,212 @@
+/*
+  style.css: how everything looks.
+
+  Each colour has ONE job, so a colour always means the same thing:
+    baby blue  = the page background (soft bubblegum baby blue)
+    white      = tabs and the panel under them
+    navy       = text, and special boxes (the ELISpot plate, the Legacy notice)
+    green      = immunogenic
+    yellow     = weakly immunogenic
+    magenta    = ELISpot spots and the chosen tab
+    red        = a warning (an unverified link)
+  The five column groups of the table also get one colour each, as a thin stripe on top.
+*/
+
+/* ---------- 1. Colours, sizes, fonts (named once, used everywhere) ---------- */
+:root {
+  --sky: #cdeaff;          /* bubblegum soft baby blue page */
+  --paper: #ffffff;        /* white tabs and panel */
+  --navy: #0b1f4d;         /* text and special boxes */
+  --navy-soft: #4a5b85;    /* quieter text */
+  --line: #d3e0f2;         /* thin lines between rows */
+  --tint: #f3f7fd;         /* a whisper of blue for table headings and hover */
+  --green: #23883d;        /* grass green: immunogenic (deep enough for white text) */
+  --yellow: #ffc72c;       /* yellow: weakly immunogenic */
+  --magenta: #d6267e;      /* magenta: spots, chosen tab */
+  --red: #d7261e;          /* red: warnings only */
+  --sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+
+/* ---------- 2. Page basics ---------- */
+* { box-sizing: border-box; }
+html { background: var(--sky); color: var(--navy); }
+body { margin: 0; font: 15px/1.5 var(--sans); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--navy); color: var(--paper); }               /* highlighted text */
+a { color: var(--navy); text-decoration-color: var(--magenta); text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+a:hover { color: var(--magenta); }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }   /* keyboard users can see where they are */
+[hidden] { display: none !important; }                                   /* "hidden" always wins */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.mono { font-family: var(--mono); letter-spacing: .02em; }
+.page { max-width: 1320px; margin: 0 auto; padding: 40px 32px 72px; }
+h2 { margin: 0; font-size: 20px; line-height: 1.25; }
+
+/* ---------- 3. Header ---------- */
+.masthead { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.masthead h1 { margin: 0; font-size: clamp(34px, 5vw, 52px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.lede { margin: 12px 0 0; color: var(--navy-soft); max-width: 60ch; }
+.search input {
+  width: 340px; max-width: 100%; padding: 11px 14px; font: inherit; color: var(--navy);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+}
+.search input::placeholder { color: var(--navy-soft); }
+
+/* ---------- 4. Tabs: white glass microscope slides ---------- */
+/* Each tab = a frosted label (name + count) + a clear glass end with a tiny stained tissue drawing.
+   The chosen tab's label turns navy. */
+.tabs { display: flex; gap: 12px; margin: 36px 0 28px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: thin; }
+.tabs button {
+  all: unset; cursor: pointer; flex: none; display: flex; align-items: stretch; height: 44px;
+  background: var(--paper); border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12), 0 4px 10px -6px rgba(0, 0, 0, .28);
+  transition: transform .15s ease-out;
+}
+.tabs button:hover { transform: translateY(-2px); }
+.tabs .label {                                            /* the frosted (ground-glass) end */
+  display: flex; align-items: center; gap: 8px; padding: 0 14px; font-weight: 800; color: var(--navy);
+  background: repeating-linear-gradient(45deg, #ffffff 0 2px, #eef3fa 2px 4px); border-radius: 3px 0 0 3px;
+}
+.tabs .glass { width: 40px; display: grid; place-items: center; border-left: 1px solid var(--line); }
+.tabs .glass svg { width: 24px; height: 20px; }
+.tabs .n { font-weight: 500; font-size: 12px; color: var(--navy-soft); }
+.tabs button[aria-selected="true"] .label { background: var(--navy); color: var(--paper); }
+.tabs button[aria-selected="true"] .n { color: #b9c8e8; }
+.tabs .legacy-tab .n { background: var(--red); color: var(--paper); padding: 1px 7px; border-radius: 99px; font-weight: 700; }
+.tabs button:focus-visible { outline: 2px solid var(--magenta); outline-offset: 3px; }
+
+/* No big white sheet: the pale blue page shows through, and each piece sits on it. */
+.panel { padding: 0; }
+
+/* ---------- 5. The ELISpot plate (a navy special box) ---------- */
+.bench > *, .masthead > *, .panel > * { min-width: 0; }               /* boxes may shrink to fit a phone */
+.bench { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 44px; align-items: start; margin-bottom: 44px; }
+.plate {
+  background: var(--navy); border-radius: 14px; padding: 18px 20px 20px;
+  display: grid; grid-template-columns: 16px repeat(12, 34px); gap: 7px;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, .45);
+  font-size: 11px; color: #9fb3dc;
+}
+.plate .label { display: grid; place-items: center; }
+.well {
+  all: unset; position: relative; width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+  background: var(--paper); box-shadow: inset 0 2px 4px rgba(11, 31, 77, .28); overflow: hidden;   /* spots stay inside the well */
+}
+.well.unused { background: #1d3263; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .35); cursor: default; }
+.well.untested { background: #e9eef8; }                                     /* tested nothing: pale, no spots */
+.well:not(.unused):hover, .well:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.well i { position: absolute; border-radius: 50%; background: var(--magenta); }  /* one spot */
+
+.readout { background: var(--paper); border-radius: 14px; padding: 24px 26px; }
+.readout .hint { color: var(--navy-soft); margin: 8px 0 20px; max-width: 48ch; }
+.key { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 380px; }
+.key li { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.key b { font-weight: 700; }
+.well-info { margin: 24px 0 0; padding: 14px 16px; border-radius: 10px; background: var(--sky); color: var(--navy-soft); min-height: 78px; max-width: 520px; }
+.well-info strong { color: var(--navy); }
+
+/* Little coloured dots that stand for a status (used in the key and in the table) */
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.yes { background: var(--green); }
+.dot.weak { background: var(--yellow); }
+.dot.no { border: 2px solid var(--navy); }                                  /* hollow ring */
+.dot.untested { border: 1.5px solid var(--navy-soft); opacity: .5; }
+
+/* ---------- 6. Tables ---------- */
+.table-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+.count { margin: 0; color: var(--navy-soft); }
+.scroll { overflow-x: auto; background: var(--paper); border-radius: 12px; padding: 8px; scrollbar-color: var(--navy-soft) var(--tint); }
+table { border-collapse: separate; border-spacing: 0; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--tint); font-weight: 700; font-size: 13px; line-height: 1.3; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+td { font-size: 14px; }
+
+/* The five column groups: solid blocks of colour, sub-headings in a light tint of the same colour */
+tr.groups th { font-size: 14px; color: var(--paper); border-bottom: 0; }
+.g-plain    { background: var(--navy); }
+.g-context  { background: var(--magenta); }
+.g-mutation { background: var(--red); }
+.g-peptide  { background: var(--yellow); color: var(--navy) !important; }   /* navy text: white is unreadable on yellow */
+.g-hla      { background: var(--green); }
+.g-evidence { background: var(--navy); }
+tr.groups th + th { border-left: 2px solid var(--paper); }
+tr.groups th:first-child { border-top-left-radius: 8px; }
+tr.groups th:last-child { border-top-right-radius: 8px; }
+.t-context  { background: #fbe3ef; }
+.t-mutation { background: #fbe1df; }
+.t-peptide  { background: #fff3cf; }
+.t-hla      { background: #def2e3; }
+.t-evidence { background: #e1e6f1; }
+
+/* Records table details */
+table.records td { min-width: 120px; max-width: 280px; }
+table.records td .clip { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+table.records tbody tr { cursor: pointer; }
+table.records tbody tr:hover td, table.records tbody tr.hit td { background: var(--tint); }
+table.records tr.hit td { background: #fbe3ef; }                              /* the row a well pointed to */
+td.seq { font-family: var(--mono); word-break: break-all; min-width: 150px; }
+.gene a { font-weight: 800; font-size: 15px; }
+.none { color: var(--navy-soft); opacity: .75; }                           /* "Not reported" and empty cells */
+
+/* Status pills: filled with the status colour, always with words (colour never stands alone) */
+.pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-weight: 700; font-size: 12.5px; white-space: nowrap; }
+.pill.yes { background: var(--green); color: var(--paper); }
+.pill.weak { background: var(--yellow); color: var(--navy); }
+.pill.no { background: var(--navy); color: var(--paper); }
+.pill.untested { background: var(--sky); color: var(--navy-soft); }
+.status-text { margin-top: 6px; font-size: 13px; color: var(--navy-soft); }
+
+/* Extra tables from the other Excel tabs */
+.ref { margin-top: 52px; }
+.ref h2 { margin-bottom: 4px; }
+.ref th { background: var(--navy); color: var(--paper); }
+.ref .from { margin: 0 0 14px; color: var(--navy-soft); font-size: 13px; }
+.ref td { min-width: 150px; max-width: 360px; }
+.ref td .clip { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+#records[hidden] + #references .ref:first-child { margin-top: 0; }           /* no records above: no gap */
+.ref td .clip.open { display: block; }                                      /* clicked: show all of it */
+.ref td a { word-break: break-all; }
+.empty { color: var(--navy-soft); padding: 20px 0; margin: 0; }
+
+/* ---------- 7. Warnings: unverified links (red) ---------- */
+.suspect a { color: var(--red); text-decoration-color: var(--red); }
+.flag { display: block; margin-top: 6px; color: var(--red); font-weight: 700; font-size: 12.5px; line-height: 1.35; }
+.notice { background: var(--navy); color: var(--paper); border-radius: 12px; padding: 22px 26px; margin-bottom: 8px; }
+.notice p { margin: 8px 0 0; max-width: 80ch; color: #d6e1f5; }
+.notice strong { color: var(--yellow); }
+
+/* ---------- 8. Record page (detail.html) ---------- */
+.back { font-weight: 700; text-decoration: none; }
+.record-title { margin: 14px 0 0; font-size: clamp(30px, 4vw, 44px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+.record-sub { margin: 10px 0 30px; color: var(--navy-soft); }
+.groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 18px; }
+.group { position: relative; background: var(--paper); border-radius: 12px; padding: 24px 24px 20px; overflow: hidden; }
+.group::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; }
+.group h2 { font-size: 17px; margin-bottom: 14px; }
+.group dl { display: grid; grid-template-columns: 170px 1fr; gap: 10px 16px; margin: 0; }
+.group dt { color: var(--navy-soft); font-size: 14px; }
+.group dd { margin: 0; word-break: break-word; }
+
+/* ---------- 9. Small screens (phones) ---------- */
+@media (max-width: 960px) {
+  .bench { grid-template-columns: 1fr; gap: 28px; }
+  .plate { overflow-x: auto; justify-self: start; max-width: 100%; }
+}
+@media (max-width: 640px) {
+  .page { padding: 24px 16px 48px; }
+
+  .plate { grid-template-columns: 14px repeat(12, 22px); gap: 4px; padding: 12px; }
+  .well { width: 22px; height: 22px; }
+  .group dl { grid-template-columns: 1fr; gap: 2px; }
+  .group dd { margin-bottom: 10px; }
+  .search input { width: 100%; }
+  .search { width: 100%; }
+}
+
+/* ---------- 10. The one animation: spots "develop" when the plate is filled ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .well i { animation: develop .7s cubic-bezier(.16, 1, .3, 1) both; }
+}
+@keyframes develop { from { opacity: 0; transform: scale(.2); } }

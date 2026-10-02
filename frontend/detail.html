@@ -1,0 +1,79 @@
+<!doctype html>
+<!--
+  detail.html: the page for ONE record (opens when you click a row on the main page).
+  The address looks like detail.html?id=12, where 12 is the record's number in the database.
+  The fields are grouped exactly like the column groups of the Excel 'Database' tab.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Record · Neoantigen Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Each group card gets the same colour stripe as its group on the main table. */
+  .group.context::before { background: var(--magenta); }
+  .group.mutation::before { background: var(--red); }
+  .group.peptide::before { background: var(--yellow); }
+  .group.hla::before { background: var(--green); }
+  .group.evidence::before { background: var(--navy); }
+  .group.source::before { background: var(--navy-soft); }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html" id="back">Back to the database</a>
+  <h1 class="record-title" id="title">Loading record…</h1>
+  <p class="record-sub" id="sub"></p>
+  <div class="groups-grid" id="groups"></div>
+</div>
+<script>
+  // Which record? Read the number after "?id=" in the address.
+  const id = new URLSearchParams(location.search).get("id");
+
+  // The groups and their fields: [css class, group name, [[field, label as in the sheet], ...]]
+  const GROUPS = [
+    ["source", "Source", [["data_source", "Data Source"], ["pmid", "PMID"], ["reference_link", "Reference Link"], ["annotator", "Annotator"], ["source_sheet", "Spreadsheet tab"]]],
+    ["context", "Cancer and clinical context", [["cancer_type", "Cancer Type"], ["cancer_stage", "Cancer Stage"], ["treatment_response", "Treatment and response"]]],
+    ["mutation", "Mutation", [["gene", "Gene"], ["mutation_type", "Mutation Type"], ["location", "Location"], ["hotspot_recurrent", "Hotspot/Recurrent"]]],
+    ["peptide", "Peptide Information", [["wild_type_sequence", "Wild Type Sequences"], ["mutant_sequence", "Mutant Sequences"], ["peptide_length", "Peptide Length"], ["source_protein_uniprot", "Source Protein [Uniprot ID]"]]],
+    ["hla", "HLA and Predicted Data", [["hla", "HLA"], ["predicted_binding_affinity", "Predicted Binding Affinity (nM)"], ["immunogenicity_score", "Immunogenicity Score"], ["tools_used", "Tool(s) used"]]],
+    ["evidence", "Evidence", [["evidence_type", "Evidence Type"], ["assay_method", "Assay Method"], ["immunogenic_status", "Immunogenic/Non-Immunogenic"], ["clinical_trial", "Clinical Trial (if any)"]]],
+  ];
+
+  // Make text safe for HTML, and turn web addresses / PubMed numbers into links.
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function value(field, v) {
+    if (v === null || v === undefined || v === "") return '<span class="none">Not reported</span>';
+    if (/^https?:\/\/\S+$/i.test(v)) return `<a href="${esc(v)}" target="_blank" rel="noopener noreferrer">${esc(v)}</a>`;
+    if (field === "pmid" && /^\d{5,9}$/.test(v)) return `<a href="https://pubmed.ncbi.nlm.nih.gov/${v}/" target="_blank" rel="noopener noreferrer">${v}</a>`;
+    const mono = field.endsWith("_sequence") ? ' class="mono"' : "";
+    return `<span${mono}>${esc(v)}</span>`;
+  }
+
+  async function load() {
+    // Go back to the same gene tab we came from.
+    if (document.referrer.includes("#")) document.getElementById("back").href = "index.html#" + document.referrer.split("#")[1];
+    const res = id ? await fetch(`/api/neoantigens/${encodeURIComponent(id)}`) : null;
+    if (!res || !res.ok) {
+      document.getElementById("title").textContent = "Record not found";
+      document.getElementById("sub").textContent = "This link points to a record that does not exist. Go back and pick one from the table.";
+      return;
+    }
+    const d = await res.json();
+    document.title = `${d.gene || "Record"} ${d.location || ""} · Neoantigen Database`;
+    document.getElementById("title").textContent = `${d.gene || "Unknown gene"}: ${d.location || d.mutation_type || "record " + d.id}`;
+    document.getElementById("sub").textContent = [d.mutant_sequence, d.hla, d.immunogenic_status].filter(Boolean).join("   |   ");
+    document.getElementById("groups").innerHTML = GROUPS.map(([cls, name, fields]) => `
+      <section class="group ${cls}">
+        <h2>${name}</h2>
+        <dl>${fields.map(([f, label]) => `<dt>${label}</dt><dd>${value(f, d[f])}</dd>`).join("")}</dl>
+      </section>`).join("");
+  }
+  load();
+</script>
+</body>
+</html>
